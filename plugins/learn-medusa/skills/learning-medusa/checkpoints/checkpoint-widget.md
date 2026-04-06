@@ -7,29 +7,26 @@ This checkpoint verifies that you've successfully created a widget that displays
 Before proceeding, test your understanding:
 
 1. **What is a widget and how is it different from a UI route?**
-   <details>
-   <summary>Answer</summary>
 
-   A widget is a React component injected into an existing admin page at a predefined zone. It extends existing pages without replacing them. A UI route is a completely new page you create. Use widgets when you want to add information to existing pages (like adding brand to product details). Use UI routes when you need a new standalone page (like a brands management page).
-   </details>
+  **Answer:**
+
+  A widget is a React component injected into an existing admin page at a predefined zone. It extends existing pages without replacing them. A UI route is a completely new page you create. Use widgets when you want to add information to existing pages (like adding brand to product details). Use UI routes when you need a new standalone page (like a brands management page).
 
 2. **Why do we need to refetch product data in the widget when the page already loads the product?**
-   <details>
-   <summary>Answer</summary>
 
-   The product detail page doesn't include linked relations by default (like brand). We need to explicitly request the brand data using the `fields` parameter. The widget fetches the same product but with `fields: "+brand.*"` to include the brand relation. React Query caches this, so it's not inefficient.
-   </details>
+  **Answer:**
+
+  The product detail page doesn't include linked relations by default (like brand). We need to explicitly request the brand data using the `fields` parameter. The widget fetches the same product but with `fields: "+brand.*"` to include the brand relation. React Query caches this, so it's not inefficient.
 
 3. **What is React Query's `queryKey` and why is it important?**
-   <details>
-   <summary>Answer</summary>
 
-   `queryKey` is a unique identifier for a query. React Query uses it for caching, refetching, and invalidation. The key should include all dependencies - in our case, `["product", product.id, "brand"]`. If the product ID changes, React Query knows to fetch different data. If you mutate a brand, you can invalidate this key to refetch fresh data.
-   </details>
+  **Answer:**
+
+  `queryKey` is a unique identifier for a query. React Query uses it for caching, refetching, and invalidation. The key should include all dependencies - in our case, `["product", product.id, "brand"]`. If the product ID changes, React Query knows to fetch different data. If you mutate a brand, you can invalidate this key to refetch fresh data.
 
 4. **Why do widgets use Medusa UI components instead of regular HTML/CSS?**
-   <details>
-   <summary>Answer</summary>
+
+  **Answer:**
 
    Medusa UI components maintain design consistency with the rest of the admin dashboard (colors, spacing, typography, interactions). They're also accessible and responsive out of the box. Using standard HTML/CSS would make your widget look out of place and require extra styling work.
    </details>
@@ -56,6 +53,7 @@ Show me your `src/admin/lib/sdk.ts` file.
 Show me your `src/admin/widgets/product-brand.tsx` file.
 
 **Key things to check**:
+
 - [ ] Imports `defineWidgetConfig` from "@medusajs/admin-sdk"
 - [ ] Imports types: `DetailWidgetProps`, `AdminProduct` from "@medusajs/framework/types"
 - [ ] Imports UI components: `Container`, `Heading`, `Text` from "@medusajs/ui"
@@ -91,6 +89,7 @@ npm run dev
 4. Look for the Brand widget at the TOP of the product details page
 
 **Expected**:
+
 - Widget appears with heading "Brand"
 - Shows brand name (e.g., "Nike")
 - Widget styling matches other admin widgets
@@ -101,6 +100,7 @@ npm run dev
 2. Check the widget
 
 **Expected**:
+
 - Widget still appears
 - Shows "-" for the brand name (indicating no brand)
 
@@ -114,11 +114,13 @@ npm run dev
 
 **Fix**:
 Find the exact version used by Medusa:
+
 ```bash
 pnpm list @tanstack/react-query --depth=10 | grep @medusajs/dashboard
 ```
 
 Install that specific version:
+
 ```bash
 pnpm add @tanstack/react-query@5.x.x
 ```
@@ -130,19 +132,25 @@ pnpm add @tanstack/react-query@5.x.x
 **Causes and Fixes**:
 
 **Cause 1**: Wrong zone name
+
 - **Fix**: Use exact zone: `"product.details.before"`
 
 **Cause 2**: Config not exported
+
 - **Fix**: Ensure you export config:
+
   ```typescript
   export const config = defineWidgetConfig({ zone: "product.details.before" })
   ```
 
 **Cause 3**: File not in correct location
+
 - **Fix**: Ensure file is at `src/admin/widgets/product-brand.tsx`
 
 **Cause 4**: Default export missing
+
 - **Fix**: Ensure component is default exported:
+
   ```typescript
   export default ProductBrandWidget
   ```
@@ -155,6 +163,7 @@ pnpm add @tanstack/react-query@5.x.x
 
 **Fix**:
 Type the query result properly:
+
 ```typescript
 const { data: queryResult } = useQuery({ ... })
 const brandName = (queryResult?.product as AdminProductBrand)?.brand?.name
@@ -169,12 +178,15 @@ Use optional chaining throughout.
 **Causes and Fixes**:
 
 **Cause 1**: fields parameter incorrect
+
 - **Fix**: Use `"+brand.*"` (with + sign)
 
 **Cause 2**: Link not created
+
 - **Fix**: Verify link exists (see Checkpoint 2.2)
 
 **Cause 3**: Extracting brand from wrong location
+
 - **Fix**: Check structure of queryResult
 
 ### "sdk is not defined"
@@ -184,6 +196,7 @@ Use optional chaining throughout.
 **Cause**: SDK not imported or initialized
 
 **Fix**:
+
 1. Create `src/admin/lib/sdk.ts` (see Implementation Check #1)
 2. Import in widget: `import { sdk } from "../lib/sdk"`
 
@@ -195,6 +208,7 @@ Use optional chaining throughout.
 
 **Fix**:
 Use only Medusa UI components:
+
 ```typescript
 import { Container, Heading, Text } from "@medusajs/ui"
 
@@ -215,6 +229,7 @@ import { Container, Heading, Text } from "@medusajs/ui"
 
 **Fix**:
 Use `"product.details.before"` zone (not `.after`):
+
 ```typescript
 export const config = defineWidgetConfig({
   zone: "product.details.before",
@@ -229,6 +244,7 @@ export const config = defineWidgetConfig({
 
 **Fix**:
 Use generic DetailWidgetProps:
+
 ```typescript
 const ProductBrandWidget = ({
   data: product,
@@ -255,7 +271,7 @@ At this point, you should understand:
 
 **Widget injection system**:
 
-```
+```bash
 Admin Product Detail Page
 ┌────────────────────────────────────┐
 │  Page Header                       │
